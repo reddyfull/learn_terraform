@@ -21,13 +21,18 @@ jobs:
         curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
         az --version
 
-    - name: Login to Azure
-      uses: azure/login@v1
-      with:
-        creds: ${{ secrets.AZURE_CLIENT_ID }} ${{ secrets.AZURE_CLIENT_SECRET }} ${{ secrets.AZURE_TENANT_ID }}
-
-    - name: Setup Terraform
+    - name: Set up Terraform
       uses: hashicorp/setup-terraform@v1
+
+    - name: Configure Azure credentials
+      run: |
+        echo ${{ secrets.AZURE_CREDENTIALS }} > azure_credentials.json
+
+    - name: Login to Azure
+      run: az login --service-principal --tenant ${{ secrets.AZURE_TENANT_ID }} --client-id ${{ secrets.AZURE_CLIENT_ID }} --password ${{ secrets.AZURE_CLIENT_SECRET }}
+
+    - name: Set up Azure CLI
+      run: az configure --defaults group=${{ env.AZURE_RG_NAME }}
 
     - name: Terraform Init
       run: terraform init
