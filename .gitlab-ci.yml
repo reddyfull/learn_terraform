@@ -1,0 +1,10 @@
+stages:
+  - terraform
+
+terraform:
+  stage: terraform
+  image: hashicorp/terraform:latest
+  script:
+    - terraform init
+    - terraform plan -out=tfplan
+    - terraform apply -input=false tfplan
