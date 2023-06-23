@@ -14,7 +14,6 @@
 # To contribute improvements to CI/CD templates, please follow the Development guide at:
 # https://docs.gitlab.com/ee/development/cicd/templates.html
 # This specific template is located at:
-  #bash
 stages:
   - trigger
   - terraform
@@ -27,10 +26,12 @@ trigger_pipeline:
 terraform:
   stage: terraform
   image: hashicorp/terraform:latest
+  variables:
+    TF_INPUT: "false"
   script:
-    - bash -c "terraform init"
-    - bash -c "terraform plan -out=tfplan"
-    - bash -c "terraform apply -input=false tfplan"
+    - /bin/bash -c "terraform init"
+    - /bin/bash -c "terraform plan -out=tfplan"
+    - /bin/bash -c "terraform apply -input=false tfplan"
   only:
     - main
   variables:
