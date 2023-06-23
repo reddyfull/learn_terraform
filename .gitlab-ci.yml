@@ -1,3 +1,7 @@
+trigger_pipeline:
+  script:
+    - "curl -X POST --fail -F token=glptt-2002ca2b69e5ec91bd27d355211646614c750306 -F ref=main https://gitlab.com/api/v4/projects/47117778/trigger/pipeline"
+
 stages:
   - terraform
 
