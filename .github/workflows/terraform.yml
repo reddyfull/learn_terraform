@@ -13,33 +13,35 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v2
+      - name: Checkout code
+        uses: actions/checkout@v2
 
-    - name: Install Az CLI
-      run: |
-        curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
-        az --version
+      - name: Install Az CLI
+        run: |
+          curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
+          az --version
 
-    - name: Set up Terraform
-      uses: hashicorp/setup-terraform@v1
+      - name: Set up Terraform
+        uses: hashicorp/setup-terraform@v1
 
-    - name: Configure Azure credentials
-      run: |
-        echo ${{ secrets.AZURE_CREDENTIALS }} > azure_credentials.json
+      - name: Configure Azure credentials
+        run: |
+          echo ${{ secrets.AZURE_CREDENTIALS }} > azure_credentials.json
 
-    - name: Login to Azure
-      run: az login --service-principal --tenant ${{ secrets.AZURE_TENANT_ID }} --client-id ${{ secrets.AZURE_CLIENT_ID }} --password ${{ secrets.AZURE_CLIENT_SECRET }}
-      
+      - name: Login to Azure
+        run: |
+          az login --service-principal --tenant ${{ secrets.AZURE_TENANT_ID }} \
+            --client-id ${{ secrets.AZURE_CLIENT_ID }} \
+            --password ${{ secrets.AZURE_CLIENT_SECRET }}
 
-    - name: Set up Azure CLI
-      run: az configure --defaults group=${{ env.AZURE_RG_NAME }}
+      - name: Set up Azure CLI
+        run: az configure --defaults group=${{ env.AZURE_RG_NAME }}
 
-    - name: Terraform Init
-      run: terraform init
+      - name: Terraform Init
+        run: terraform init
 
-    - name: Terraform Plan
-      run: terraform plan -out=tfplan
+      - name: Terraform Plan
+        run: terraform plan -out=tfplan
 
-    - name: Terraform Apply
-      run: terraform apply -auto-approve tfplan
+      - name: Terraform Apply
+        run: terraform apply -auto-approve tfplan
