@@ -36,6 +36,13 @@ jobs:
     - name: Assign Owner role to resource group
       run: |
         az role assignment create --role "Owner" --assignee ${{ secrets.CLIENT_ID }} --scope /subscriptions/${{ secrets.SUBSCRIPTION_ID }}/resourceGroups/mydevloperuseastactions
+        
+    - name: Assign Owner role to resource group
+      run: |
+        az role assignment create --role "reader" --assignee ${{ secrets.CLIENT_ID }} --scope /subscriptions/${{ secrets.SUBSCRIPTION_ID }}/resourceGroups/mydevloperuseastactions
+          
+  
+
 
     - name: Set up Azure CLI
       run: az configure --defaults group=${{ env.AZURE_RG_NAME }}
