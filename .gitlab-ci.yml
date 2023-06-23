@@ -15,7 +15,6 @@
 # https://docs.gitlab.com/ee/development/cicd/templates.html
 # This specific template is located at:
 # https://gitlab.com/gitlab-org/gitlab/-/blob/master/lib/gitlab/ci/templates/Getting-Started.gitlab-ci.yml
-
 stages:
   - trigger
   - terraform
@@ -29,9 +28,9 @@ terraform:
   stage: terraform
   image: hashicorp/terraform:latest
   script:
-    - terraform init
-    - terraform plan -out=tfplan
-    - terraform apply -input=false tfplan
+    - /bin/sh -c "terraform init"
+    - /bin/sh -c "terraform plan -out=tfplan"
+    - /bin/sh -c "terraform apply -input=false tfplan"
   only:
     - main
   variables:
