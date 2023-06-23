@@ -28,9 +28,9 @@ terraform:
   stage: terraform
   image: hashicorp/terraform:latest
   script:
-    - /bin/sh -c "terraform init"
-    - /bin/sh -c "terraform plan -out=tfplan"
-    - /bin/sh -c "terraform apply -input=false tfplan"
+    - terraform init
+    - terraform plan -out=tfplan
+    - terraform apply -input=false tfplan
   only:
     - main
   variables:
@@ -38,3 +38,4 @@ terraform:
     ARM_CLIENT_SECRET: $ARM_CLIENT_SECRET
     ARM_SUBSCRIPTION_ID: $ARM_SUBSCRIPTION_ID
     ARM_TENANT_ID: $ARM_TENANT_ID
+
