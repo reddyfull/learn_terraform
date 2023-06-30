@@ -1,14 +1,14 @@
 {
   "version": 4,
   "terraform_version": "1.5.2",
-  "serial": 4,
+  "serial": 3,
   "lineage": "fbd0523f-54d3-acf9-edb9-73ccf76a65c0",
   "outputs": {},
   "resources": [
     {
       "mode": "managed",
       "type": "azurerm_resource_group",
-      "name": "sriterraformdevenv",
+      "name": "example",
       "provider": "provider[\"registry.terraform.io/hashicorp/azurerm\"]",
       "instances": [
         {
