@@ -1,8 +1,3 @@
-variable "name" {}
-variable "name2" {}
-variable "resource_group_name" {}
-variable "location" {}
-
 resource "azurerm_storage_account" "sa" {
   name                     = var.name
   resource_group_name      = var.resource_group_name
