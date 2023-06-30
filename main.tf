@@ -39,12 +39,15 @@ resource "azurerm_storage_account" "sridevterraformstorage2019" {
   account_tier             = "Standard"
   account_replication_type = "LRS"
   account_kind = "StorageV2"
-  tags = {
-    environment = "developer"
-  }
-}
 
+  lifecycle {
+    prevent_destroy = true
+  }
+}
   tags = {
     environment = "developer"
   }
-}
+
+
+  
+
