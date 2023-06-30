@@ -28,6 +28,6 @@ resource "azurerm_resource_group" "sriterraformdevenv" {
   location = "East US"
 
   lifecycle {
-    prevent_destroy = true
+    prevent_destroy = false
   }
 }
