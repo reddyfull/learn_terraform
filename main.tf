@@ -23,7 +23,11 @@ provider "azurerm" {
   features {}
 }
 
-resource "azurerm_resource_group" "example" {
+resource "azurerm_resource_group" "sriterraformdevenv" {
   name     = "sriterraformdevenv"
   location = "East US"
+
+  lifecycle {
+    prevent_destroy = true
+  }
 }
