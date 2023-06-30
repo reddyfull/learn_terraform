@@ -34,3 +34,12 @@ module "storage_account" {
   resource_group_name = module.resource_group.name
   location            = "East US"
 }
+
+module "storage_account" {
+  source               = "./modules/storage_account"
+  name                 = "sritfrmstg2019"
+  name2                = "sritfrkali2019"
+  resource_group_name  = azurerm_resource_group.sriterraformdevenv.name
+  location             = "East US"
+}
+
