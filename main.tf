@@ -1,4 +1,3 @@
-# Variables 
 variable "subscription_id" {}
 variable "tenant_id" {}
 variable "client_id" {}
@@ -23,32 +22,15 @@ provider "azurerm" {
   features {}
 }
 
-resource "azurerm_resource_group" "sriterraformdevenv" {
+module "resource_group" {
+  source   = "./resource_group"
   name     = "sriterraformdevenv"
   location = "East US"
-
-  lifecycle {
-    prevent_destroy = false
-  }
 }
 
-resource "azurerm_storage_account" "sritfrmstg2019" {
-  name                     = "sritfrmstg2019"
-  resource_group_name      = "sriterraformdevenv"
-  location                 = "East US"
-  account_tier             = "Standard"
-  account_replication_type = "LRS"
-  account_kind             = "StorageV2"
-
-  tags = {
-    environment = "developer"
-  }
-
-  lifecycle {
-    prevent_destroy = false
-  }
+module "storage_account" {
+  source              = "./storage_account"
+  name                = "sritfrmstg2019"
+  resource_group_name = module.resource_group.name
+  location            = "East US"
 }
-
-
-  
-
