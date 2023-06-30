@@ -28,6 +28,23 @@ resource "azurerm_resource_group" "sriterraformdevenv" {
   location = "East US"
 
   lifecycle {
-    prevent_destroy = false
+    prevent_destroy = true
+  }
+}
+
+resource "azurerm_storage_account" "sridevterraformstorage2019" {
+  name                     = "sridevterraformstorage2019"
+  resource_group_name      = "sriterraformdevenv"
+  location                 = "East US"
+  account_tier             = "Standard"
+  account_replication_type = "LRS"
+  account_kind = "StorageV2"
+  tags = {
+    environment = "developer"
+  }
+}
+
+  tags = {
+    environment = "developer"
   }
 }
