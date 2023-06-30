@@ -32,8 +32,8 @@ resource "azurerm_resource_group" "sriterraformdevenv" {
   }
 }
 
-resource "azurerm_storage_account" "sridevterraformstorage2019" {
-  name                     = "sridevterraformstorage2019"
+resource "azurerm_storage_account" "sritfrmstg2019" {
+  name                     = "sritfrmstg2019"
   resource_group_name      = "sriterraformdevenv"
   location                 = "East US"
   account_tier             = "Standard"
