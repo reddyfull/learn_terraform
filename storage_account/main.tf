@@ -1,4 +1,5 @@
 variable "name" {}
+variable "name2" {}
 variable "resource_group_name" {}
 variable "location" {}
 
@@ -35,4 +36,3 @@ resource "azurerm_storage_account" "sa2" {
     prevent_destroy = false
   }
 }
-
