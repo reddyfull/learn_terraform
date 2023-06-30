@@ -1,46 +1,33 @@
-name: Terraform Deployment
-
+name: 'Terraform'
 on:
   push:
     branches:
-      - main
-
-env:
-  AZURE_RG_NAME: example-resource-group
+    - main
+  pull_request:
 
 jobs:
-  deploy:
+  terraform:
+    name: 'Terraform'
     runs-on: ubuntu-latest
 
+    env:
+      TF_VAR_subscription_id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+      TF_VAR_tenant_id: ${{ secrets.AZURE_TENANT_ID }}
+      TF_VAR_client_id: ${{ secrets.AZURE_CLIENT_ID }}
+      TF_VAR_client_secret: ${{ secrets.AZURE_CLIENT_SECRET }}
+
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v2
+      - name: Checkout
+        uses: actions/checkout@v2
 
-    - name: Install Az CLI
-      run: |
-        curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
-        az --version
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v1
 
-    - name: Set up Terraform
-      uses: hashicorp/setup-terraform@v1
+      - name: Terraform Initialize
+        run: terraform init
 
-    - name: Log in to Azure
-      run: |
-        az login --service-principal --username ${{ secrets.CLIENT_ID }} --password ${{ secrets.CLIENT_SECRET }} --tenant ${{ secrets.TENANT_ID }}
-        az account set --subscription ${{ secrets.SUBSCRIPTION_ID }}
+      - name: Terraform Plan
+        run: terraform plan
 
-    - name: Assign Owner role to resource group
-      run: |
-        az role assignment create --role "Owner" --assignee ${{ secrets.CLIENT_ID }} --scope /subscriptions/${{ secrets.SUBSCRIPTION_ID }}/resourceGroups/mydevloperuseastactions
-        
-    - name: Set up Azure CLI
-      run: az configure --defaults group=${{ env.AZURE_RG_NAME }}
-
-    - name: Terraform Init
-      run: terraform init
-
-    - name: Terraform Plan
-      run: terraform plan -out=tfplan
-
-    - name: Terraform Apply
-      run: terraform apply -auto-approve tfplan
+      - name: Terraform Apply
+        run: terraform apply -auto-approve
