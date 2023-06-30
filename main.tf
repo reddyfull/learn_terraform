@@ -28,18 +28,16 @@ module "resource_group" {
   location = "East US"
 }
 
-module "storage_account" {
+module "storage_account1" {
   source              = "./storage_account"
   name                = "sritfrmstg2019"
   resource_group_name = module.resource_group.name
   location            = "East US"
 }
 
-module "storage_account" {
-  source               = "./modules/storage_account"
-  name                 = "sritfrmstg2019"
-  name2                = "sritfrkali2019"
-  resource_group_name  = azurerm_resource_group.sriterraformdevenv.name
-  location             = "East US"
+module "storage_account2" {
+  source              = "./storage_account"
+  name                = "sritfrkali2019"
+  resource_group_name = module.resource_group.name
+  location            = "East US"
 }
-
