@@ -45,7 +45,7 @@ resource "azurerm_storage_account" "sritfrmstg2019" {
   }
 
   lifecycle {
-    prevent_destroy = true
+    prevent_destroy = false
   }
 }
 
