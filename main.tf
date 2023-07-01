@@ -38,14 +38,14 @@ module "storage_account" {
 
 resource "azurerm_storage_container" "data" {
   name = "data"
-  storage_account_name = module.storage_account.name
+  storage_account_name = module.storage_account.name1
   container_access_type = "blob"
   
 }
 
 resource "azurerm_storage_blob" "jenkinsfile" {
   name                   = "Jenkinsfile"
-  storage_account_name   = module.storage_account.name
+  storage_account_name   = module.storage_account.name1
   storage_container_name = azurerm_storage_container.data.name
   type                   = "Block"
   source                 = "/Users/sritadip/Documents/learn_terraform/Jenkinsfile"
