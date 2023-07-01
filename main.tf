@@ -35,4 +35,19 @@ module "storage_account" {
   resource_group_name = module.resource_group.name
   location            = "East US"
 }
+
+resource "azurerm_storage_container" "data" {
+  name = "data"
+  storage_account_name = "sritfrmstg2019"
+  container_access_type = "blob"
+  
+}
+
+resource "azurerm_storage_blob" "jenkinsfile" {
+  name                   = "Jenkinsfile"
+  storage_account_name   = sritfrmstg2019
+  storage_container_name = data
+  type                   = "Block"
+  source                 = "/Users/sritadip/Documents/learn_terraform/Jenkinsfile"
+}
 #test
