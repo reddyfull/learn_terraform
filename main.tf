@@ -48,5 +48,5 @@ resource "azurerm_storage_blob" "example" {
   storage_account_name   = "sridevstorage2009"
   storage_container_name = "sridata"
   type                   = "Block"
-  source                 = "/Users/sritadip/Documents/learn_terraform/Jenkinsfile"
+  source                 = "Jenkinsfile"
 }
