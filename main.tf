@@ -27,3 +27,13 @@ resource "azurerm_resource_group" "appgrp" {
   location = "East US"
 }
 
+resource "azurerm_storage_account" "sridevstorage2009" {
+  name                     = "sridevstorage2009"
+  resource_group_name      = "app-grp-sri2009"
+  location                 = "East US"
+  account_tier             = "Standard"
+  account_kind             = "StorageV2"
+  account_replication_type = "LRS"
+ 
+}
+
