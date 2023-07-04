@@ -27,35 +27,28 @@ resource "azurerm_resource_group" "appgrp" {
   location = "East US"
 }
 
-resource "azurerm_storage_account" "sridevstorage2009" {
-  name                     = "sridevstorage2009"
-  resource_group_name      = "app-grp-sri2009"
-  location                 = "East US"
-  account_tier             = "Standard"
-  account_kind             = "StorageV2"
-  account_replication_type = "LRS"
-  depends_on = [ 
-    azurerm_resource_group.appgrp
-   ]
+resource "azurerm_virtual_network" "example" {
+  name                = "sri-network"
+  location            = "East US"
+  resource_group_name = "app-grp-sri2009"
+  address_space       = ["10.0.0.0/16"]
+
+  subnet {
+    name           = "subnet1"
+    address_prefix = "10.0.0.0/24"
+  }
+
+  subnet {
+    name           = "subnet2"
+    address_prefix = "10.0.1.0/24"
+    security_group = azurerm_network_security_group.example.id
+  }
  
-}
 
-resource "azurerm_storage_container" "data" {
-  name                  = "sridata"
-  storage_account_name  = "sridevstorage2009"
-  container_access_type = "blob"
-  depends_on = [ 
-    azurerm_storage_account.sridevstorage2009
-   ]
-}
-
-resource "azurerm_storage_blob" "example" {
-  name                   = "Jenkinsfile"
-  storage_account_name   = "sridevstorage2009"
-  storage_container_name = "sridata"
-  type                   = "Block"
-  source                 = "Jenkinsfile"
-  depends_on = [ 
-    azurerm_storage_container.data
+  tags = {
+    environment = "Developer"
+  }
+   depends_on = [ 
+    azurerm_resource_group.appgrp
    ]
 }
