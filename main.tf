@@ -54,7 +54,7 @@ resource "azurerm_network_security_group" "example" {
   # Add any necessary rules or configuration for the network security group
 }
 
-resource "azurerm_virtual_network" "example" {
+resource "azurerm_virtual_network" "srinetwork" {
   name                = local.virtual_network.name
   location            = local.location
   resource_group_name = local.resource_group_name
@@ -71,7 +71,7 @@ resource "azurerm_virtual_network" "example" {
   virtual_network_name = local.virtual_network.name
   address_prefixes     = [local.subnets[0].address_prefix]
   depends_on = [
-    azurerm_virtual_network.appnetwork
+    azurerm_virtual_network.azurerm_virtual_network.srinetwork
   ]
 }
 
@@ -81,6 +81,6 @@ resource "azurerm_subnet" "subnetB" {
   virtual_network_name = local.virtual_network.name
   address_prefixes     = [local.subnets[1].address_prefix]
   depends_on = [
-    azurerm_virtual_network.appnetwork
+    azurerm_virtual_network.azurerm_virtual_network.srinetwork
   ]
 }
