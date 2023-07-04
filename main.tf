@@ -71,7 +71,7 @@ resource "azurerm_virtual_network" "srinetwork" {
   virtual_network_name = local.virtual_network.name
   address_prefixes     = [local.subnets[0].address_prefix]
   depends_on = [
-    azurerm_virtual_network.azurerm_virtual_network.srinetwork
+    azurerm_virtual_network.srinetwork
   ]
 }
 
@@ -81,6 +81,6 @@ resource "azurerm_subnet" "subnetB" {
   virtual_network_name = local.virtual_network.name
   address_prefixes     = [local.subnets[1].address_prefix]
   depends_on = [
-    azurerm_virtual_network.azurerm_virtual_network.srinetwork
+    azurerm_virtual_network.srinetwork
   ]
 }
