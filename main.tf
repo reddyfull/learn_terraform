@@ -34,6 +34,9 @@ resource "azurerm_storage_account" "sridevstorage2009" {
   account_tier             = "Standard"
   account_kind             = "StorageV2"
   account_replication_type = "LRS"
+  depends_on = [ 
+    azurerm_resource_group.appgrp
+   ]
  
 }
 
@@ -41,6 +44,9 @@ resource "azurerm_storage_container" "data" {
   name                  = "sridata"
   storage_account_name  = "sridevstorage2009"
   container_access_type = "blob"
+  depends_on = [ 
+    azurerm_storage_account.sridevstorage2009
+   ]
 }
 
 resource "azurerm_storage_blob" "example" {
@@ -49,4 +55,7 @@ resource "azurerm_storage_blob" "example" {
   storage_container_name = "sridata"
   type                   = "Block"
   source                 = "Jenkinsfile"
+  depends_on = [ 
+    azurerm_storage_container.data
+   ]
 }
