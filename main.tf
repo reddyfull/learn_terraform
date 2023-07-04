@@ -3,6 +3,11 @@ variable "tenant_id" {}
 variable "client_id" {}
 variable "client_secret" {}
 
+locals {
+  resource_group_name = "app-grp-sri2009"
+  location = "East US"
+}
+
 terraform {
   required_version = ">= 0.14.9"
   required_providers {
@@ -23,21 +28,21 @@ provider "azurerm" {
 }
 
 resource "azurerm_resource_group" "appgrp" {
-  name     = "app-grp-sri2009"
-  location = "East US"
+  name     = local.resource_group_name
+  location = local.location
 }
 
 resource "azurerm_network_security_group" "example" {
   name                = "example-nsg"
-  location            = "East US"
+  location            = local.location
   resource_group_name = azurerm_resource_group.appgrp.name
   # Add any necessary rules or configuration for the network security group
 }
 
 resource "azurerm_virtual_network" "example" {
   name                = "sri-network"
-  location            = "East US"
-  resource_group_name = azurerm_resource_group.appgrp.name
+  location            = local.location
+  resource_group_name = local.resource_group_name
   address_space       = ["10.0.0.0/16"]
 
   subnet {
@@ -60,3 +65,4 @@ resource "azurerm_virtual_network" "example" {
     azurerm_network_security_group.example
   ]
 }
+#text
