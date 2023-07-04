@@ -27,10 +27,17 @@ resource "azurerm_resource_group" "appgrp" {
   location = "East US"
 }
 
+resource "azurerm_network_security_group" "example" {
+  name                = "example-nsg"
+  location            = "East US"
+  resource_group_name = azurerm_resource_group.appgrp.name
+  # Add any necessary rules or configuration for the network security group
+}
+
 resource "azurerm_virtual_network" "example" {
   name                = "sri-network"
   location            = "East US"
-  resource_group_name = "app-grp-sri2009"
+  resource_group_name = azurerm_resource_group.appgrp.name
   address_space       = ["10.0.0.0/16"]
 
   subnet {
@@ -43,12 +50,13 @@ resource "azurerm_virtual_network" "example" {
     address_prefix = "10.0.1.0/24"
     security_group = azurerm_network_security_group.example.id
   }
- 
 
   tags = {
     environment = "Developer"
   }
-   depends_on = [ 
-    azurerm_resource_group.appgrp
-   ]
+  
+  depends_on = [
+    azurerm_resource_group.appgrp,
+    azurerm_network_security_group.example
+  ]
 }
