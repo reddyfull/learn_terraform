@@ -1,0 +1,11 @@
+{
+    "scriptFile": "eventgrid.py",
+    "bindings": [
+      {
+        "type": "eventGridTrigger",
+        "name": "event",
+        "direction": "in"
+      }
+    ]
+  }
+  
