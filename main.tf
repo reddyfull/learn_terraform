@@ -51,7 +51,6 @@ resource "azurerm_network_security_group" "example" {
   name                = "example-nsg"
   location            = local.location
   resource_group_name = azurerm_resource_group.appgrp.name
-  # Add any necessary rules or configuration for the network security group
 }
 
 resource "azurerm_virtual_network" "srinetwork" {
@@ -59,20 +58,13 @@ resource "azurerm_virtual_network" "srinetwork" {
   location            = local.location
   resource_group_name = local.resource_group_name
   address_space       = [local.virtual_network.address_space]
-
-  depends_on = [ 
-    azurerm_resource_group.appgrp
-   ]
 }
 
-  resource "azurerm_subnet" "subnetA" {
+resource "azurerm_subnet" "subnetA" {
   name                 = local.subnets[0].name
   resource_group_name  = local.resource_group_name
   virtual_network_name = local.virtual_network.name
   address_prefixes     = [local.subnets[0].address_prefix]
-  depends_on = [
-    azurerm_virtual_network.srinetwork
-  ]
 }
 
 resource "azurerm_subnet" "subnetB" {
@@ -80,7 +72,38 @@ resource "azurerm_subnet" "subnetB" {
   resource_group_name  = local.resource_group_name
   virtual_network_name = local.virtual_network.name
   address_prefixes     = [local.subnets[1].address_prefix]
-  depends_on = [
-    azurerm_virtual_network.srinetwork
-  ]
+}
+
+resource "azurerm_storage_account" "funcstorage" {
+  name                     = "funcstoragesri2009"
+  resource_group_name      = azurerm_resource_group.appgrp.name
+  location                 = azurerm_resource_group.appgrp.location
+  account_tier             = "Standard"
+  account_replication_type = "LRS"
+}
+
+resource "azurerm_app_service_plan" "funcappserviceplan" {
+  name                = "func-app-service-plan"
+  location            = azurerm_resource_group.appgrp.location
+  resource_group_name = azurerm_resource_group.appgrp.name
+
+  sku {
+    tier = "Dynamic"
+    size = "Y1"
+  }
+}
+
+resource "azurerm_function_app" "funcapp" {
+  name                       = "sriterraformtfstate"
+  location                   = azurerm_resource_group.appgrp.location
+  resource_group_name        = azurerm_resource_group.appgrp.name
+  app_service_plan_id        = azurerm_app_service_plan.funcappserviceplan.id
+  storage_account_name       = azurerm_storage_account.funcstorage.name
+  storage_account_access_key = azurerm_storage_account.funcstorage.primary_access_key
+  os_type                    = "linux"
+  version                    = "~3"
+
+  app_settings = {
+    "FUNCTIONS_WORKER_RUNTIME" = "python"
+  }
 }
