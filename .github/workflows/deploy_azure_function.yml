@@ -1,4 +1,4 @@
-name: Python package
+name: Deploy Python Function App to Azure
 
 on:
   push:
@@ -6,12 +6,20 @@ on:
   pull_request:
     branches: [ main ]
 
+env:
+  AZURE_FUNCTIONAPP_NAME: '<your-function-app-name>'  # replace with your Function App name
+  AZURE_FUNCTIONAPP_PACKAGE_PATH: '.'  # replace with your application's path if not in root
+  ENVIRONMENT_NAME: 'Development'
+
 jobs:
-  deploy:
+  build-and-deploy:
     runs-on: ubuntu-latest
+    environment: 
+      name: ${{ env.ENVIRONMENT_NAME }}
 
     steps:
-    - uses: actions/checkout@v2
+    - name: Checkout code
+      uses: actions/checkout@v2
 
     - name: Set up Python
       uses: actions/setup-python@v2
@@ -26,7 +34,7 @@ jobs:
     - name: Deploy to Azure Functions
       uses: azure/functions-action@v1
       with:
-        app-name: sriterraformtfstate
-        package: .
+        app-name: ${{ env.AZURE_FUNCTIONAPP_NAME }}
+        package: ${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}
         publish-profile: ${{ secrets.AZURE_FUNCTIONAPP_PUBLISH_PROFILE }}
-
+        app-settings-json: '{"SCM_DO_BUILD_DURING_DEPLOYMENT": "true"}'
