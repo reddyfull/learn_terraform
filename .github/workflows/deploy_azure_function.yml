@@ -7,15 +7,14 @@ on:
     branches: [ main ]
 
 env:
-  AZURE_FUNCTIONAPP_NAME: '<your-function-app-name>'  # replace with your Function App name
+  AZURE_FUNCTIONAPP_NAME: 'sriterraformtfstate'  # replace with your Function App name
   AZURE_FUNCTIONAPP_PACKAGE_PATH: '.'  # replace with your application's path if not in root
-  ENVIRONMENT_NAME: 'Development'
 
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
     environment: 
-      name: ${{ env.ENVIRONMENT_NAME }}
+      name: 'Development'
 
     steps:
     - name: Checkout code
