@@ -21,8 +21,8 @@ jobs:
         with:
           projectBaseDir: .
           args: >
-            -Dsonar.organization=Srinivasa Tadipatri
-            -Dsonar.projectKey=reddyfull
+            -Dsonar.organization=reddyfull
+            -Dsonar.projectKey=reddyfull_learn_terraform
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
