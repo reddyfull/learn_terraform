@@ -98,6 +98,7 @@ resource "azurerm_storage_account" "funcstorage" {
   location                 = azurerm_resource_group.appgrp.location
   account_tier             = "Standard"
   account_replication_type = "LRS"
+  min_tls_version          = "TLS1_2"
 
   depends_on = [
     azurerm_resource_group.appgrp
