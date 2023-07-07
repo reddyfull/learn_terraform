@@ -17,10 +17,10 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Task 1: Checkout
+      - name: 'Task 1: Checkout'
         uses: actions/checkout@v2
-
-      - name: Task 2: SonarCloud Scan
+        
+      - name: 'Task 2: SonarCloud Scan'
         uses: SonarSource/sonarcloud-github-action@master
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -31,42 +31,31 @@ jobs:
             -Dsonar.organization=reddyfull
             -Dsonar.projectKey=reddyfull_learn_terraform
 
-      - name: Task 3: Setup environment
+      - name: 'Task 3: Setup environment'
         run: |
-          if [[ "${{ github.ref }}" == *"staging"* ]]; then
+          if [[ "${{ github.ref }}" == "refs/heads/staging" ]]; then
             echo "TF_ENV=staging" >> $GITHUB_ENV
-          elif [[ "${{ github.ref }}" == *"main"* ]]; then
+          elif [[ "${{ github.ref }}" == "refs/heads/main" ]]; then
             echo "TF_ENV=main" >> $GITHUB_ENV
           fi
-          echo "Task 3: Setup environment completed"
 
-      - name: Task 4: Setup Terraform
+      - name: 'Task 4: Setup Terraform'
         uses: hashicorp/setup-terraform@v1
-        env:
-          AZURE_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-          AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
-          AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
-          AZURE_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
+        with:
+          cli_config_credentials_token: ${{ secrets.TF_API_TOKEN }}
 
-      - name: Task 5: Set environment variables
+      - name: 'Task 5: Set environment variables'
         run: |
-          echo "TF_VAR_subscription_id=${{ env.AZURE_SUBSCRIPTION_ID }}" >> $GITHUB_ENV
-          echo "TF_VAR_tenant_id=${{ env.AZURE_TENANT_ID }}" >> $GITHUB_ENV
-          echo "TF_VAR_client_id=${{ env.AZURE_CLIENT_ID }}" >> $GITHUB_ENV
-          echo "TF_VAR_client_secret=${{ env.AZURE_CLIENT_SECRET }}" >> $GITHUB_ENV
-          echo "Task 5: Set environment variables completed"
+          echo "TF_VAR_subscription_id=${{ secrets.AZURE_SUBSCRIPTION_ID }}" >> $GITHUB_ENV
+          echo "TF_VAR_tenant_id=${{ secrets.AZURE_TENANT_ID }}" >> $GITHUB_ENV
+          echo "TF_VAR_client_id=${{ secrets.AZURE_CLIENT_ID }}" >> $GITHUB_ENV
+          echo "TF_VAR_client_secret=${{ secrets.AZURE_CLIENT_SECRET }}" >> $GITHUB_ENV
 
-      - name: Task 6: Terraform Initialize
-        run: |
-          terraform init
-          echo "Task 6: Terraform Initialize completed"
+      - name: 'Task 6: Terraform Initialize'
+        run: terraform init
 
-      - name: Task 7: Terraform Plan
-        run: |
-          terraform plan
-          echo "Task 7: Terraform Plan completed"
+      - name: 'Task 7: Terraform Plan'
+        run: terraform plan
 
-      - name: Task 8: Terraform Apply
-        run: |
-          terraform apply -auto-approve
-          echo "Task 8: Terraform Apply completed"
+      - name: 'Task 8: Terraform Apply'
+        run: terraform apply -auto-approve
