@@ -6,9 +6,6 @@ on:
     - main
   pull_request:
 
-env:
-  TF_ENV: 'prod' # Default environment
-
 jobs:
   terraform:
     name: 'Terraform'
@@ -17,14 +14,6 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v2
-
-      - name: Set environment
-        run: |
-          if [[ "${{ github.ref }}" == "refs/heads/main" ]]; then
-            echo "TF_ENV=prod" >> $GITHUB_ENV
-          else
-            echo "TF_ENV=dev" >> $GITHUB_ENV
-          fi
 
       # SonarCloud Scan
       - name: SonarCloud Scan
@@ -38,27 +27,12 @@ jobs:
             -Dsonar.organization=reddyfull
             -Dsonar.projectKey=reddyfull_learn_terraform
 
-      - name: Set environment-specific secrets
-        id: set_secrets
-        run: |
-          if [[ "${{ env.TF_ENV }}" == "prod" ]]; then
-            echo "::set-output name=SUBSCRIPTION_ID::${{ secrets.AZURE_SUBSCRIPTION_ID_PROD }}"
-            echo "::set-output name=TENANT_ID::${{ secrets.AZURE_TENANT_ID_PROD }}"
-            echo "::set-output name=CLIENT_ID::${{ secrets.AZURE_CLIENT_ID_PROD }}"
-            echo "::set-output name=CLIENT_SECRET::${{ secrets.AZURE_CLIENT_SECRET_PROD }}"
-          else
-            echo "::set-output name=SUBSCRIPTION_ID::${{ secrets.AZURE_SUBSCRIPTION_ID_DEV }}"
-            echo "::set-output name=TENANT_ID::${{ secrets.AZURE_TENANT_ID_DEV }}"
-            echo "::set-output name=CLIENT_ID::${{ secrets.AZURE_CLIENT_ID_DEV }}"
-            echo "::set-output name=CLIENT_SECRET::${{ secrets.AZURE_CLIENT_SECRET_DEV }}"
-          fi
-
       - name: Set environment variables
         run: |
-          echo "TF_VAR_subscription_id=${{ steps.set_secrets.outputs.SUBSCRIPTION_ID }}" >> $GITHUB_ENV
-          echo "TF_VAR_tenant_id=${{ steps.set_secrets.outputs.TENANT_ID }}" >> $GITHUB_ENV
-          echo "TF_VAR_client_id=${{ steps.set_secrets.outputs.CLIENT_ID }}" >> $GITHUB_ENV
-          echo "TF_VAR_client_secret=${{ steps.set_secrets.outputs.CLIENT_SECRET }}" >> $GITHUB_ENV
+          echo "TF_VAR_subscription_id=${{ secrets.AZURE_SUBSCRIPTION_ID }}" >> $GITHUB_ENV
+          echo "TF_VAR_tenant_id=${{ secrets.AZURE_TENANT_ID }}" >> $GITHUB_ENV
+          echo "TF_VAR_client_id=${{ secrets.AZURE_CLIENT_ID }}" >> $GITHUB_ENV
+          echo "TF_VAR_client_secret=${{ secrets.AZURE_CLIENT_SECRET }}" >> $GITHUB_ENV
 
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v1
