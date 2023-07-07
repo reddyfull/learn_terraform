@@ -1,7 +1,9 @@
+# Terraform version: 0.14.9
 variable "subscription_id" {}
 variable "tenant_id" {}
 variable "client_id" {}
 variable "client_secret" {}
+
 
 locals {
   resource_group_name = "app-grp-sri2009"
