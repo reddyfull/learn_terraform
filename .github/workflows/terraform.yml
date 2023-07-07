@@ -24,7 +24,7 @@ jobs:
         with:
           projectBaseDir: .
           args: >
-            -Dsonar.organization=Srinivasa-Tadipatri
+            -Dsonar.organization=reddyfull
             -Dsonar.projectKey=reddyfull_learn_terraform
 
       - name: Set environment variables
