@@ -65,3 +65,14 @@ jobs:
 
       - name: 'Task 8: Terraform Apply'
         run: terraform apply -auto-approve
+
+  developer_environment:
+    name: 'Deploy to developer environment'
+    runs-on: ubuntu-latest
+    needs: terraform
+    if: github.ref == 'refs/heads/develop'
+
+    steps:
+      - name: 'Task 9: Deploy'
+        run: echo "Deploying to developer environment..."
+        # Add actual deployment commands here
