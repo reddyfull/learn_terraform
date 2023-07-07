@@ -127,7 +127,7 @@ resource "azurerm_function_app" "funcapp" {
   storage_account_name       = azurerm_storage_account.funcstorage.name
   storage_account_access_key = azurerm_storage_account.funcstorage.primary_access_key
   os_type                    = "linux"
-  version                    = "~3"
+  version                    = "3.10"
 
   app_settings = {
     "FUNCTIONS_WORKER_RUNTIME" = "python"
