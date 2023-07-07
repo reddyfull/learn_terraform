@@ -2,8 +2,10 @@ name: 'Terraform'
 
 on:
   push:
+    branches:
+      - main
     tags:
-    - '*'
+      - '*'
   pull_request:
 
 env:
