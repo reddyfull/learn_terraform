@@ -2,9 +2,12 @@ name: 'Terraform'
 
 on:
   push:
-    branches:
-    - main
+    tags:
+    - '*'
   pull_request:
+
+env:
+  TF_ENV: "develop" # default to develop environment
 
 jobs:
   terraform:
@@ -27,15 +30,28 @@ jobs:
             -Dsonar.organization=reddyfull
             -Dsonar.projectKey=reddyfull_learn_terraform
 
-      - name: Set environment variables
+      - name: Setup environment
         run: |
-          echo "TF_VAR_subscription_id=${{ secrets.AZURE_SUBSCRIPTION_ID }}" >> $GITHUB_ENV
-          echo "TF_VAR_tenant_id=${{ secrets.AZURE_TENANT_ID }}" >> $GITHUB_ENV
-          echo "TF_VAR_client_id=${{ secrets.AZURE_CLIENT_ID }}" >> $GITHUB_ENV
-          echo "TF_VAR_client_secret=${{ secrets.AZURE_CLIENT_SECRET }}" >> $GITHUB_ENV
+          if [[ "${{ github.ref }}" == *"staging"* ]]; then
+            echo "TF_ENV=staging" >> $GITHUB_ENV
+          elif [[ "${{ github.ref }}" == *"main"* ]]; then
+            echo "TF_ENV=main" >> $GITHUB_ENV
+          fi
 
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v1
+        env:
+          AZURE_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+          AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+          AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
+          AZURE_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
+
+      - name: Set environment variables
+        run: |
+          echo "TF_VAR_subscription_id=${{ env.AZURE_SUBSCRIPTION_ID }}" >> $GITHUB_ENV
+          echo "TF_VAR_tenant_id=${{ env.AZURE_TENANT_ID }}" >> $GITHUB_ENV
+          echo "TF_VAR_client_id=${{ env.AZURE_CLIENT_ID }}" >> $GITHUB_ENV
+          echo "TF_VAR_client_secret=${{ env.AZURE_CLIENT_SECRET }}" >> $GITHUB_ENV
 
       - name: Terraform Initialize
         run: terraform init
