@@ -108,21 +108,48 @@ resource "azurerm_function_app" "funcapp" {
 }
 
 resource "azurerm_frontdoor" "frontdoor" {
-  name = "srin_frontdoor"
-  resource_group_name = azurerm_resource_group.appgrp.name
-  location = azurerm_resource_group.appgrp.location
-  sku_name = "Premium_AzureFrontDoor"
-  
-  backend_pool {
-    name = "my-backend-pool"
-    backend {
-      address = "my-web-app"
-      port = 80
+  name                                         = "example-frontdoor"
+  resource_group_name                          = azurerm_resource_group.appgrp.name
+  sku_name                                     = "Premium_AzureFrontDoor"
+  enforce_backend_pools_certificate_name_check = false
+
+  routing_rule {
+    name               = "exampleRoutingRule"
+    accepted_protocols = ["Http", "Https"]
+    patterns_to_match  = ["/*"]
+    frontend_endpoints = ["exampleFrontendEndpoint"]
+
+    forwarding_configuration {
+      forwarding_protocol = "MatchRequest"
+      backend_pool_name   = "exampleBackendPool"
     }
   }
-  
-  endpoint {
-    name = "my-endpoint"
-    host_name = "my-endpoint-hostname"
+
+  backend_pool_load_balancing {
+    name = "exampleLoadBalancingSettings"
+  }
+
+  backend_pool_health_probe {
+    name = "exampleHealthProbeSettings"
+  }
+
+  backend_pool {
+    name = "exampleBackendPool"
+    backend {
+      host_header = "www.example.com"
+      address     = "www.example.com"
+      http_port   = 80
+      https_port  = 443
+      priority    = 1
+      weight      = 50
+    }
+
+    load_balancing_name = "exampleLoadBalancingSettings"
+    health_probe_name   = "exampleHealthProbeSettings"
+  }
+
+  frontend_endpoint {
+    name                              = "exampleFrontendEndpoint"
+    host_name                         = "example-frontdoor.azurefd.net"
   }
 }
