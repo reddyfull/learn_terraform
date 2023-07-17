@@ -1,7 +1,9 @@
+# Terraform version: 0.14.9
 variable "subscription_id" {}
 variable "tenant_id" {}
 variable "client_id" {}
 variable "client_secret" {}
+
 
 locals {
   resource_group_name = "app-grp-sri2009"
@@ -47,11 +49,25 @@ resource "azurerm_resource_group" "appgrp" {
   location = local.location
 }
 
+resource "azurerm_network_security_group" "example" {
+  name                = "example-nsg"
+  location            = local.location
+  resource_group_name = azurerm_resource_group.appgrp.name
+
+  depends_on = [
+    azurerm_resource_group.appgrp
+  ]
+}
+
 resource "azurerm_virtual_network" "srinetwork" {
   name                = local.virtual_network.name
   location            = local.location
   resource_group_name = local.resource_group_name
   address_space       = [local.virtual_network.address_space]
+
+  depends_on = [
+    azurerm_resource_group.appgrp
+  ]
 }
 
 resource "azurerm_subnet" "subnetA" {
@@ -59,6 +75,10 @@ resource "azurerm_subnet" "subnetA" {
   resource_group_name  = local.resource_group_name
   virtual_network_name = local.virtual_network.name
   address_prefixes     = [local.subnets[0].address_prefix]
+
+  depends_on = [
+    azurerm_virtual_network.srinetwork
+  ]
 }
 
 resource "azurerm_subnet" "subnetB" {
@@ -66,6 +86,10 @@ resource "azurerm_subnet" "subnetB" {
   resource_group_name  = local.resource_group_name
   virtual_network_name = local.virtual_network.name
   address_prefixes     = [local.subnets[1].address_prefix]
+
+  depends_on = [
+    azurerm_virtual_network.srinetwork
+  ]
 }
 
 resource "azurerm_storage_account" "funcstorage" {
@@ -75,6 +99,10 @@ resource "azurerm_storage_account" "funcstorage" {
   account_tier             = "Standard"
   account_replication_type = "LRS"
   min_tls_version          = "TLS1_2"
+
+  depends_on = [
+    azurerm_resource_group.appgrp
+  ]
 }
 
 resource "azurerm_app_service_plan" "funcappserviceplan" {
@@ -105,24 +133,9 @@ resource "azurerm_function_app" "funcapp" {
   app_settings = {
     "FUNCTIONS_WORKER_RUNTIME" = "python"
   }
-}
 
-resource "azurerm_frontdoor" "frontdoor" {
-  name = "srin_frontdoor"
-  resource_group_name = azurerm_resource_group.appgrp.name
-  location = azurerm_resource_group.appgrp.location
-  sku_name = "Premium_AzureFrontDoor"
-  
-  backend_pool {
-    name = "my-backend-pool"
-    backend {
-      address = "my-web-app"
-      port = 80
-    }
-  }
-  
-  endpoint {
-    name = "my-endpoint"
-    host_name = "my-endpoint-hostname"
-  }
+  depends_on = [
+    azurerm_app_service_plan.funcappserviceplan,
+    azurerm_storage_account.funcstorage
+  ]
 }
