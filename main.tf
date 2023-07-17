@@ -71,13 +71,12 @@ resource "azurerm_subnet" "subnetB" {
 resource "azurerm_frontdoor" "example" {
   name                = "srifrontdoor"
   resource_group_name = azurerm_resource_group.appgrp.name
-  #enforce_backend_pools_certificate_name_check = false  # Commented due to the error
 
   routing_rule {
     name               = "srifrontdoor/webroute"
     accepted_protocols = ["Http", "Https"]
     patterns_to_match  = ["/*"]
-    frontend_endpoints = [azurerm_frontdoor_frontend_endpoint.example.name]
+    frontend_endpoints = ["exampleFrontendEndpoint"]
 
     forwarding_configuration {
       forwarding_protocol = "MatchRequest"
@@ -114,8 +113,8 @@ resource "azurerm_frontdoor" "example" {
   }
 
   frontend_endpoint {
-    name                              = "srikali122009"
-    host_name                         = "srikali122009-haesa8e9hmasbea8.z01.azurefd.net"
+    name                              = "exampleFrontendEndpoint"
+    host_name                         = "example-frontend-endpoint-haesa8e9hmasbea8.z01.azurefd.net"
     custom_https_provisioning_enabled = false
   }
 }
@@ -128,9 +127,9 @@ resource "azurerm_frontdoor_firewall_policy" "example" {
   custom_rule {
     name      = "Rule1"
     priority  = 1
-    rule_type = "MatchRule"
+    //rule_type = "MatchRule"  # This is not a valid argument and should be removed
 
-    match_condition {
+    match_conditions {
       match_variable     = "RemoteAddr"
       operator           = "IPMatch"
       negation_condition = false
@@ -143,6 +142,6 @@ resource "azurerm_frontdoor_firewall_policy" "example" {
   managed_rule {
     type    = "DefaultRuleSet"
     version = "2.1"
-    # rule_group_override block is not supported and therefore is removed.
+    // rule_group_override block is not supported and therefore is removed.
   }
 }
