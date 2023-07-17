@@ -108,9 +108,10 @@ resource "azurerm_function_app" "funcapp" {
 }
 
 resource "azurerm_frontdoor" "frontdoor" {
-  name                                         = "example-frontdoor"
-  resource_group_name                          = azurerm_resource_group.appgrp.name
-  sku                                          = "Premium_AzureFrontDoor"
+  name                = "example-frontdoor"
+  resource_group_name = azurerm_resource_group.appgrp.name
+  sku_name            = "Premium_AzureFrontDoor"
+  enforce_backend_pools_certificate_name_check = false
 
   routing_rule {
     name               = "exampleRoutingRule"
