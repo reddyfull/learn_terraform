@@ -4,7 +4,7 @@ variable "client_id" {}
 variable "client_secret" {}
 
 locals {
-  resource_group_name = "app-grp-sri2009"
+  resource_group_name = "srifrontdoor"
   location = "East US"
   virtual_network = {
     name = "sri-network"
@@ -68,88 +68,83 @@ resource "azurerm_subnet" "subnetB" {
   address_prefixes     = [local.subnets[1].address_prefix]
 }
 
-resource "azurerm_storage_account" "funcstorage" {
-  name                     = "funcstoragesri2009"
-  resource_group_name      = azurerm_resource_group.appgrp.name
-  location                 = azurerm_resource_group.appgrp.location
-  account_tier             = "Standard"
-  account_replication_type = "LRS"
-  min_tls_version          = "TLS1_2"
-}
-
-resource "azurerm_app_service_plan" "funcappserviceplan" {
-  name                = "func-app-service-plan"
-  location            = azurerm_resource_group.appgrp.location
-  resource_group_name = azurerm_resource_group.appgrp.name
-
-  sku {
-    tier = "Dynamic"
-    size ="Y1"
-  }
-
-  depends_on = [
-    azurerm_resource_group.appgrp
-  ]
-}
-
-resource "azurerm_function_app" "funcapp" {
-  name                       = "sriterraformtfstate"
-  location                   = azurerm_resource_group.appgrp.location
-  resource_group_name        = azurerm_resource_group.appgrp.name
-  app_service_plan_id        = azurerm_app_service_plan.funcappserviceplan.id
-  storage_account_name       = azurerm_storage_account.funcstorage.name
-  storage_account_access_key = azurerm_storage_account.funcstorage.primary_access_key
-  os_type                    = "linux"
-  version                    = "3.10"
-
-  app_settings = {
-    "FUNCTIONS_WORKER_RUNTIME" = "python"
-  }
-}
-
-resource "azurerm_frontdoor" "frontdoor" {
-  name                = "example-frontdoor"
-  resource_group_name = azurerm_resource_group.appgrp.name
-  sku_name            = "Premium_AzureFrontDoor"
+resource "azurerm_frontdoor" "example" {
+  name                                         = "srifrontdoor"
+  resource_group_name                          = "srifrontdoor"
   enforce_backend_pools_certificate_name_check = false
 
   routing_rule {
-    name               = "exampleRoutingRule"
+    name               = "srifrontdoor/webroute"
     accepted_protocols = ["Http", "Https"]
     patterns_to_match  = ["/*"]
-    frontend_endpoints = ["exampleFrontendEndpoint"]
+    frontend_endpoints = ["srikali122009"]
 
     forwarding_configuration {
       forwarding_protocol = "MatchRequest"
-      backend_pool_name   = "exampleBackendPool"
+      backend_pool_name   = "testweh"
     }
   }
 
   backend_pool_load_balancing {
-    name = "exampleLoadBalancingSettings"
+    name = "loadBalancingSettings"
+    sample_size            = 4
+    successful_samples_required = 3
+    additional_latency_milliseconds = 50
   }
 
   backend_pool_health_probe {
-    name = "exampleHealthProbeSettings"
+    name = "healthProbeSettings"
+    path = "/"
+    protocol = "Http"
+    probe_method = "HEAD"
+    interval_in_seconds = 100
   }
 
   backend_pool {
-    name = "exampleBackendPool"
+    name = "testweh"
     backend {
-      host_header = "www.example.com"
-      address     = "www.example.com"
+      host_header = "cs21003200290ace8b6.blob.core.windows.net"
+      address     = "cs21003200290ace8b6.blob.core.windows.net"
       http_port   = 80
       https_port  = 443
-      priority    = 1
-      weight      = 50
     }
 
-    load_balancing_name = "exampleLoadBalancingSettings"
-    health_probe_name   = "exampleHealthProbeSettings"
+    load_balancing_name = "loadBalancingSettings"
+    health_probe_name   = "healthProbeSettings"
+  }
+}
+
+resource "azurerm_frontdoor_firewall_policy" "example" {
+  name                = "srifrontdoor"
+  resource_group_name = "srifrontdoor"
+  mode                = "Detection"
+  
+  custom_rule {
+    name      = "Microsoft_DefaultRuleSet"
+    enabled   = true
+    priority  = 1
+    rule_type = "MatchRule"
+    
+    match_conditions {
+      match_variable     = "RemoteAddr"
+      operator           = "IPMatch"
+      negation_condition = false
+      match_values       = ["192.168.1.0/24", "10.0.0.0/24"]
+    }
+
+    action = "Block"
   }
 
-  frontend_endpoint {
-    name                              = "exampleFrontendEndpoint"
-    host_name                         = "example-frontdoor.azurefd.net"
+  managed_rule {
+    type    = "DefaultRuleSet"
+    version = "2.1"
+    rule_group_override {
+      rule_group_name = "PHP"
+      rules {
+        rule_id = "933111"
+        enabled = false
+        action  = "Block"
+      }
+    }
   }
 }
