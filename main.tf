@@ -50,34 +50,34 @@ resource "azurerm_resource_group" "appgrp" {
 resource "azurerm_virtual_network" "srinetwork" {
   name                = local.virtual_network.name
   location            = local.location
-  resource_group_name = local.resource_group_name
+  resource_group_name = azurerm_resource_group.appgrp.name
   address_space       = [local.virtual_network.address_space]
 }
 
 resource "azurerm_subnet" "subnetA" {
   name                 = local.subnets[0].name
-  resource_group_name  = local.resource_group_name
-  virtual_network_name = local.virtual_network.name
+  resource_group_name  = azurerm_resource_group.appgrp.name
+  virtual_network_name = azurerm_virtual_network.srinetwork.name
   address_prefixes     = [local.subnets[0].address_prefix]
 }
 
 resource "azurerm_subnet" "subnetB" {
   name                 = local.subnets[1].name
-  resource_group_name  = local.resource_group_name
-  virtual_network_name = local.virtual_network.name
+  resource_group_name  = azurerm_resource_group.appgrp.name
+  virtual_network_name = azurerm_virtual_network.srinetwork.name
   address_prefixes     = [local.subnets[1].address_prefix]
 }
 
 resource "azurerm_frontdoor" "example" {
-  name                                         = "srifrontdoor"
-  resource_group_name                          = "srifrontdoor"
-  enforce_backend_pools_certificate_name_check = false
+  name                = "srifrontdoor"
+  resource_group_name = azurerm_resource_group.appgrp.name
+  #enforce_backend_pools_certificate_name_check = false  # Commented due to the error
 
   routing_rule {
     name               = "srifrontdoor/webroute"
     accepted_protocols = ["Http", "Https"]
     patterns_to_match  = ["/*"]
-    frontend_endpoints = ["srikali122009"]
+    frontend_endpoints = [azurerm_frontdoor_frontend_endpoint.example.name]
 
     forwarding_configuration {
       forwarding_protocol = "MatchRequest"
@@ -86,17 +86,17 @@ resource "azurerm_frontdoor" "example" {
   }
 
   backend_pool_load_balancing {
-    name = "loadBalancingSettings"
-    sample_size            = 4
-    successful_samples_required = 3
+    name                            = "loadBalancingSettings"
+    sample_size                     = 4
+    successful_samples_required     = 3
     additional_latency_milliseconds = 50
   }
 
   backend_pool_health_probe {
-    name = "healthProbeSettings"
-    path = "/"
-    protocol = "Http"
-    probe_method = "HEAD"
+    name                = "healthProbeSettings"
+    path                = "/"
+    protocol            = "Http"
+    probe_method        = "HEAD"
     interval_in_seconds = 100
   }
 
@@ -112,20 +112,25 @@ resource "azurerm_frontdoor" "example" {
     load_balancing_name = "loadBalancingSettings"
     health_probe_name   = "healthProbeSettings"
   }
+
+  frontend_endpoint {
+    name                              = "srikali122009"
+    host_name                         = "srikali122009-haesa8e9hmasbea8.z01.azurefd.net"
+    custom_https_provisioning_enabled = false
+  }
 }
 
 resource "azurerm_frontdoor_firewall_policy" "example" {
   name                = "srifrontdoor"
-  resource_group_name = "srifrontdoor"
+  resource_group_name = azurerm_resource_group.appgrp.name
   mode                = "Detection"
   
   custom_rule {
-    name      = "Microsoft_DefaultRuleSet"
-    enabled   = true
+    name      = "Rule1"
     priority  = 1
     rule_type = "MatchRule"
-    
-    match_conditions {
+
+    match_condition {
       match_variable     = "RemoteAddr"
       operator           = "IPMatch"
       negation_condition = false
@@ -138,13 +143,6 @@ resource "azurerm_frontdoor_firewall_policy" "example" {
   managed_rule {
     type    = "DefaultRuleSet"
     version = "2.1"
-    rule_group_override {
-      rule_group_name = "PHP"
-      rules {
-        rule_id = "933111"
-        enabled = false
-        action  = "Block"
-      }
-    }
+    # rule_group_override block is not supported and therefore is removed.
   }
 }
