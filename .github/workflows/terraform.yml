@@ -1,4 +1,4 @@
-name: Terraform
+name: SonarCloud and CodeQL
 
 on:
   push:
@@ -7,9 +7,6 @@ on:
     tags:
       - '*'
   pull_request:
-
-env:
-  TF_ENV: "develop" # default to develop environment
 
 jobs:
   sonarScan:
@@ -43,14 +40,15 @@ jobs:
         uses: github/codeql-action/init@v2
 
       - name: Build CodeQL database
-        uses: github/codeql-action/analyze@v2
-        with:
-          database: codeql-database
+        run: codeql database create --language=terraform --source-root=. --database=myapp-db
+
+      - name: Analyze with CodeQL
+        run: codeql database analyze --database=myapp-db --sarif=myapp-results.sarif --format=sarif-latest
 
       - name: Upload CodeQL results
-        uses: github/codeql-action/upload-sarif@v2
+        uses: github/codeql-action/upload-sarif@v1
         with:
-          sarif_file: codeql-results.sarif
+          sarif_file: myapp-results.sarif
 
   terraform:
     needs: [sonarScan, codeqlAnalysis]
