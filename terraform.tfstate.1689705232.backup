@@ -1,7 +1,7 @@
 {
   "version": 4,
   "terraform_version": "1.5.2",
-  "serial": 13,
+  "serial": 11,
   "lineage": "fbd0523f-54d3-acf9-edb9-73ccf76a65c0",
   "outputs": {},
   "resources": [
@@ -14,10 +14,10 @@
         {
           "schema_version": 0,
           "attributes": {
-            "id": "/subscriptions/217d2bdc-2706-4aa7-be71-457045f1baba/resourceGroups/srifrontdoor",
+            "id": "/subscriptions/217d2bdc-2706-4aa7-be71-457045f1baba/resourceGroups/app-grp-sri2009",
             "location": "eastus",
             "managed_by": "",
-            "name": "srifrontdoor",
+            "name": "app-grp-sri2009",
             "tags": {},
             "timeouts": null
           },
