@@ -31,8 +31,32 @@ jobs:
             -Dsonar.organization=reddyfull
             -Dsonar.projectKey=reddyfull_learn_terraform
 
+  codeqlAnalysis:
+    name: 'CodeQL Analysis'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Set up CodeQL
+        uses: github/codeql-action/setup@v1
+        with:
+          languages: terraform # Specify the languages you want to analyze
+
+      - name: Build CodeQL database
+        run: codeql database create --language=terraform --source-root=. --database=myapp-db
+
+      - name: Analyze with CodeQL
+        run: codeql database analyze --database=myapp-db --sarif=myapp-results.sarif --format=sarif-latest
+
+      - name: Upload CodeQL results
+        uses: github/codeql-action/upload-sarif@v1
+        with:
+          sarif_file: myapp-results.sarif
+
   terraform:
-    needs: sonarScan
+    needs: [sonarScan, codeqlAnalysis]
     name: 'Terraform'
     runs-on: ubuntu-latest
 
