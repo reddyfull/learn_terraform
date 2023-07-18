@@ -1,4 +1,4 @@
-name: 'Terraform'
+name: Terraform
 
 on:
   push:
@@ -7,8 +7,6 @@ on:
     tags:
       - '*'
   pull_request:
-    branches:
-      - main
 
 env:
   TF_ENV: "develop" # default to develop environment
@@ -36,35 +34,28 @@ jobs:
   codeqlAnalysis:
     name: 'CodeQL Analysis'
     runs-on: ubuntu-latest
-    needs: sonarScan
 
     steps:
       - name: Checkout
         uses: actions/checkout@v2
 
-      - name: Set up Node.js 16.x
-        uses: actions/setup-node@v2
-        with:
-          node-version: '16.x'
-
-      - name: Install CodeQL
+      - name: Set up CodeQL
         uses: github/codeql-action/init@v2
 
       - name: Build CodeQL database
-        run: codeql database create --language=terraform --source-root=. --database=myapp-db
-
-      - name: Analyze with CodeQL
-        run: codeql database analyze --database=myapp-db --sarif=myapp-results.sarif --format=sarif-latest
+        uses: github/codeql-action/analyze@v2
+        with:
+          database: codeql-database
 
       - name: Upload CodeQL results
         uses: github/codeql-action/upload-sarif@v2
         with:
-          sarif_file: myapp-results.sarif
+          sarif_file: codeql-results.sarif
 
   terraform:
+    needs: [sonarScan, codeqlAnalysis]
     name: 'Terraform'
     runs-on: ubuntu-latest
-    needs: [sonarScan, codeqlAnalysis]
 
     steps:
       - name: Checkout
