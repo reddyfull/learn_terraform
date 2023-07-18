@@ -40,9 +40,7 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Set up CodeQL
-        uses: github/codeql-action/setup@v1
-        with:
-          languages: terraform # Specify the languages you want to analyze
+        uses: github/codeql-action/setup-codeql@v1
 
       - name: Build CodeQL database
         run: codeql database create --language=terraform --source-root=. --database=myapp-db
