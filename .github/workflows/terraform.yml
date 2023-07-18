@@ -7,7 +7,23 @@ on:
   pull_request:
 
 jobs:
+  version:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Bump version and push tag
+        id: bump_version
+        uses: anothrNick/github-tag-action@1.26.0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          WITH_V: true
+          DEFAULT_BUMP: patch
+  
   sonarScan:
+    needs: [version]
     name: 'SonarCloud Scan'
     runs-on: ubuntu-latest
 
