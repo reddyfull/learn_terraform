@@ -6,7 +6,7 @@ variable "acr_name" {
   default = "srikali2009"
 }
 variable "app_name" {
-  default = "srikali2009"
+  default = "srikalitest2009"
 }
 
 locals {
