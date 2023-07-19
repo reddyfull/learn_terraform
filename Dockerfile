@@ -1,16 +1,17 @@
-FROM node:18-alpine
+# Use the official Nginx image as base
+FROM nginx:latest
 
-USER root
+# Remove the default Nginx configuration file
+RUN rm /etc/nginx/conf.d/default.conf
 
-RUN apk add --no-cache git
-RUN apk add --no-cache python3 py3-pip make g++
-# needed for pdfjs-dist
-RUN apk add --no-cache build-base cairo-dev pango-dev
-ENV PUPPETEER_SKIP_DOWNLOAD=true
+# Copy our custom Nginx configuration file
+COPY nginx.conf /etc/nginx/conf.d/
 
-# You can install a specific version like: flowise@1.0.0
-RUN npm install -g flowise
+# Copy the HTML file
+COPY welcome.html /usr/share/nginx/html/
 
-WORKDIR /data
+# Expose port 80
+EXPOSE 80
 
-CMD "flowise"
+# Start Nginx when the container has provisioned.
+CMD ["nginx", "-g", "daemon off;"]

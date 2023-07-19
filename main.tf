@@ -2,6 +2,12 @@ variable "subscription_id" {}
 variable "tenant_id" {}
 variable "client_id" {}
 variable "client_secret" {}
+variable "acr_name" {
+  default = "srikali2009"
+}
+variable "app_name" {
+  default = "srikali2009"
+}
 
 locals {
   resource_group_name = "srifrontdoor"
@@ -68,3 +74,39 @@ resource "azurerm_subnet" "subnetB" {
   address_prefixes     = [local.subnets[1].address_prefix]
 }
 
+resource "azurerm_container_registry" "acr" {
+  name                     = var.acr_name
+  resource_group_name      = azurerm_resource_group.appgrp.name
+  location                 = local.location
+  sku                      = "Basic"
+  admin_enabled            = true
+}
+
+resource "azurerm_app_service_plan" "plan" {
+  name                = "${var.app_name}_service_plan"
+  location            = local.location
+  resource_group_name = azurerm_resource_group.appgrp.name
+
+  sku {
+    tier = "Free"
+    size = "F1"
+  }
+}
+
+resource "azurerm_app_service" "app" {
+  name                = var.app_name
+  location            = local.location
+  resource_group_name = azurerm_resource_group.appgrp.name
+  app_service_plan_id = azurerm_app_service_plan.plan.id
+
+  site_config {
+    linux_fx_version = "DOCKER|${azurerm_container_registry.acr.login_server}/myapp:latest"
+    always_on        = true
+  }
+
+  app_settings = {
+    "DOCKER_REGISTRY_SERVER_URL" = "https://${azurerm_container_registry.acr.login_server}"
+    "DOCKER_REGISTRY_SERVER_USERNAME" = azurerm_container_registry.acr.admin_username
+    "DOCKER_REGISTRY_SERVER_PASSWORD" = azurerm_container_registry.acr.admin_password
+  }
+}
